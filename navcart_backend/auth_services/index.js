@@ -14,11 +14,11 @@ app.use(express.json());
 
 // ✅ CORS configuration
 const corsOptions = {
-  origin: ['https://navcart.vercel.app/'], 
+  origin: 'https://navcart.vercel.app', // allow your frontend domain
+  methods: ['GET', 'POST'],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
 };
+
 app.use(cors(corsOptions));
 
 // Port configuration
