@@ -31,7 +31,7 @@ const Map1: React.FC = () => {
 
   useEffect(() => {
     const fetchGraph = () => {
-      fetch("http://localhost:8000/graph")
+      fetch("https://navcart-python.onrender.com/graph")
         .then((res) => res.json())
         .then((data) => {
           setNodes(data.nodes);
@@ -49,7 +49,8 @@ const Map1: React.FC = () => {
   useEffect(() => {
     if (!source || !target) return;
 
-    fetch(`http://localhost:8000/shortest-path?source=${source}&target=${target}`)
+    fetch(`https://navcart-python.onrender.com/shortest-path?source=${source}&target=${target}`)
+
       .then((res) => res.json())
       .then((data) => {
         drawGraph(nodes, edges, data.path || []);
