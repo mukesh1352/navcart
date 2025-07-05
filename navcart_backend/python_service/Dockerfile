@@ -1,15 +1,23 @@
-# Use official Python image
+# Use an official Python base image
 FROM python:3.11-slim
 
-# Set working directory
+# Set the working directory
 WORKDIR /app
 
-# Copy requirements and install
+# Copy dependencies file
 COPY requirements.txt .
+
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the actual code
+# Copy the rest of the application code
 COPY . .
 
-# Command to run your app
+# Expose the port the app runs on (as per your compose file)
+EXPOSE 8000
+
+# Set environment variables (Render will let you define these too)
+ENV PYTHONUNBUFFERED=1
+
+# Command to run the application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
