@@ -2,16 +2,12 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from neo4j import GraphDatabase
 import networkx as nx
-import logging
-import time
+from neo4j import GraphDatabase, basic_auth
 
-# Logging setup
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# CORS middleware
+# Correct CORS middleware usage
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,43 +15,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Neo4j connection setup with retry
-def init_driver(uri, user, password, retries=10, delay=3):
-    for attempt in range(retries):
-        try:
-            driver = GraphDatabase.driver(uri, auth=(user, password))
-            # Test connection
-            with driver.session() as session:
-                session.run("RETURN 1")
-            logger.info("✅ Connected to Neo4j")
-            return driver
-        except Exception as e:
-            logger.warning(f"❌ Attempt {attempt + 1}: Failed to connect to Neo4j - {e}")
-            time.sleep(delay)
-    raise Exception("Failed to connect to Neo4j after retries.")
+# Neo4j driver setup
 
-# Connect to Neo4j inside Docker
-driver = init_driver("bolt://localhost:7687", "neo4j", "test")
+# AuraDB Secure URI
+AURA_URI = "neo4j+s://87c3244a.databases.neo4j.io"
+AURA_USER = "neo4j"
+AURA_PASSWORD = "iNnUaKYUQ3HA8ztBY5ocdELwMJgSsr9Gf_eG6zA6w0Q"
+
+driver = GraphDatabase.driver(AURA_URI, auth=basic_auth(AURA_USER, AURA_PASSWORD))
+
+
 
 # Fetching the graph from the Neo4j database
 def fetch_graph_from_db():
     G = nx.DiGraph()
-    try:
-        with driver.session(database="neo4j") as session:
-            result = session.run("""
-                MATCH (a:Aisle)-[r:CONNECTED]->(b:Aisle)
-                RETURN a.id AS source, b.id AS target, r.distance AS weight
-            """)
-            for record in result:
-                G.add_edge(record["source"], record["target"], weight=record["weight"])
-        return G
-    except Exception as e:
-        logger.error(f"Error fetching graph from Neo4j: {e}")
-        return nx.DiGraph()  # Return empty graph if error
+    with driver.session(database="neo4j") as session:  # updated here
+        result = session.run("""
+            MATCH (a:Aisle)-[r:CONNECTED]->(b:Aisle)
+            RETURN a.id AS source, b.id AS target, r.distance AS weight
+        """)
+        for record in result:
+            G.add_edge(record["source"], record["target"], weight=record["weight"])
+    return G
+
+
 
 @app.get("/graph")
 def get_graph():
-    G = fetch_graph_from_db()
+    G = fetch_graph_from_db()  # ✅ fixed function name
     nodes = [{"id": n} for n in G.nodes()]
     edges = [
         {"source": u, "target": v, "weight": d["weight"]}
@@ -63,14 +50,18 @@ def get_graph():
     ]
     return {"nodes": nodes, "edges": edges}
 
+
 @app.get("/shortest-path")
 def shortest_path(source: str = Query(...), target: str = Query(...)):
-    G = fetch_graph_from_db()
+    G = fetch_graph_from_db()  # ✅ fixed function name
 
+    # Validate if source and target nodes exist
     if source not in G.nodes:
         return {"error": f"Source node '{source}' does not exist in the graph."}
     if target not in G.nodes:
         return {"error": f"Target node '{target}' does not exist in the graph."}
+
+    # If source and target are the same
     if source == target:
         return {
             "path": [source],
@@ -80,16 +71,26 @@ def shortest_path(source: str = Query(...), target: str = Query(...)):
         }
 
     try:
+        # Get shortest path and cost using Dijkstra
         path = nx.dijkstra_path(G, source, target)
         cost = nx.dijkstra_path_length(G, source, target)
-        edge_path = [
-            {"source": u, "target": v, "weight": G[u][v]["weight"]}
-            for u, v in zip(path, path[1:])
-        ]
+
+        # Build edge path: pairs of (source, target, weight)
+        edge_path = []
+        for i in range(len(path) - 1):
+            u, v = path[i], path[i + 1]
+            weight = G[u][v]["weight"]
+            edge_path.append({"source": u, "target": v, "weight": weight})
+
         return {
             "path": path,
             "edges": edge_path,
             "cost": cost
         }
+
     except nx.NetworkXNoPath:
         return {"error": f"No path found from '{source}' to '{target}'"}
+import uvicorn
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
