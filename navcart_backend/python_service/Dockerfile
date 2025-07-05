@@ -1,36 +1,45 @@
 FROM python:3.11-slim
 
-# Install Java (required by Neo4j) and utilities
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    openjdk-17-jre-headless \
-    curl \
-    unzip \
-    && apt-get clean
+    wget gnupg2 curl lsb-release supervisor openjdk-17-jre-headless \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables for Neo4j
+# --------------------------
+# Install Neo4j Community Edition
+# --------------------------
+ENV NEO4J_VERSION=5.20.0
+
+RUN mkdir -p /neo4j \
+    && curl -L https://dist.neo4j.org/neo4j-community-${NEO4J_VERSION}-unix.tar.gz | tar zx -C /neo4j --strip-components=1
+
+# Set Neo4j environment variables
 ENV NEO4J_HOME=/neo4j
+ENV PATH="${NEO4J_HOME}/bin:$PATH"
+
+# Default credentials (you should change in production!)
 ENV NEO4J_AUTH=neo4j/test
 
-# Download and install Neo4j
-RUN curl -L https://dist.neo4j.org/neo4j-community-5.20.0-unix.tar.gz -o neo4j.tar.gz && \
-    mkdir -p $NEO4J_HOME && \
-    tar -xzf neo4j.tar.gz -C $NEO4J_HOME --strip-components=1 && \
-    rm neo4j.tar.gz && \
-    chmod +x $NEO4J_HOME/bin/neo4j
-
-# Install Python dependencies
+# --------------------------
+# Set up FastAPI App
+# --------------------------
 WORKDIR /app
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app files
 COPY . .
 
-# Expose FastAPI and Neo4j ports
+# --------------------------
+# Supervisor Configuration
+# --------------------------
+RUN mkdir -p /var/log/supervisor
+
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Expose ports
 EXPOSE 8000 7474 7687
 
-# Use supervisord to run both services
-RUN pip install supervisor
-COPY supervisord.conf /etc/supervisord.conf
+ENV PYTHONUNBUFFERED=1
 
-CMD ["supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/usr/bin/supervisord"]
