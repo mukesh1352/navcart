@@ -4,13 +4,22 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const cors = require('cors');
+
 // Constants
 const saltrounds = 10;
 
 // Creating an express instance
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+// ✅ CORS configuration
+const corsOptions = {
+  origin: ['https://navcart.vercel.app/'], 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
 
 // Port configuration
 const port = process.env.PORT || 3000;
@@ -23,12 +32,9 @@ app.listen(port, () => {
 // MongoDB connection
 const mongoURL = process.env.connectionString;
 
-mongoose.connect(mongoURL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("Connected to the database..."))
-.catch((err) => console.log("Connection Error:", err));
+mongoose.connect(mongoURL)
+  .then(() => console.log("Connected to the database..."))
+  .catch((err) => console.log("Connection Error:", err));
 
 // Mongoose Schema and Model
 const userSchema = new mongoose.Schema({
@@ -48,7 +54,6 @@ app.post('/api/signup', async (req, res) => {
       return res.status(400).json({ message: "User already exists." });
     }
 
-    //This is the hashing spot
     const hashedPassword = await bcrypt.hash(password, saltrounds);
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
@@ -73,7 +78,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ message: "User not found." });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);//Comparing the hashed passwords with the origin
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password." });
