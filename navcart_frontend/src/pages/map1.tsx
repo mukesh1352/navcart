@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const BACKEND_URL = "https://navcart-python.onrender.com";
-
 type Node = {
   id: string;
   x?: number;
@@ -34,7 +32,7 @@ const Map1: React.FC = () => {
 
   const fetchGraph = async () => {
     try {
-      const res = await fetch(`${BACKEND_URL}/graph`);
+      const res = await fetch(`https://navcart-python.onrender.com/graph`);
       const data = await res.json();
       setNodes(data.nodes);
       setEdges(data.edges);
@@ -45,21 +43,6 @@ const Map1: React.FC = () => {
     }
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const fetchShortestPath = async () => {
-    if (!source || !target) return;
-    try {
-      const res = await fetch(
-        `${BACKEND_URL}/shortest-path?source=${source}&target=${target}`
-      );
-      const data = await res.json();
-      setPath(data.path || []);
-      setTotalDistance(data.total_weight ?? null);
-    } catch (error) {
-      console.error("Error fetching shortest path:", error);
-    }
-  };
-
   useEffect(() => {
     fetchGraph();
     const intervalId = setInterval(fetchGraph, 10000);
@@ -67,8 +50,21 @@ const Map1: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const fetchShortestPath = async () => {
+      if (!source || !target) return;
+      try {
+        const res = await fetch(
+          `https://navcart-python.onrender.com/shortest-path?source=${source}&target=${target}`
+        );
+        const data = await res.json();
+        setPath(data.path || []);
+        setTotalDistance(data.total_weight ?? null);
+      } catch (error) {
+        console.error("Error fetching shortest path:", error);
+      }
+    };
     fetchShortestPath();
-  }, [fetchShortestPath, source, target]);
+  }, [source, target]);
 
   useEffect(() => {
     drawGraph(nodes, edges, path);
