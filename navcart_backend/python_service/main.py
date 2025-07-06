@@ -14,7 +14,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Neo4j connection setup
 URI = "neo4j+s://e26e2102.databases.neo4j.io"
 AUTH = ("neo4j", "igmb8yB0xLB6Gkk0tGY4AH_6D9mjfCbt7kJs-2sfxAk")
 driver = GraphDatabase.driver(URI, auth=AUTH)

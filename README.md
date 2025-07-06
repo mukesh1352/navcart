@@ -2,6 +2,10 @@
 
 This project uses **MongoDB (via Docker)** and **Express.js** to handle basic user authentication (Signup & Login).
 
+### If pnpm not installed in the system 
+```bash
+npm install -g pnpm
+```
 ---
 
 ##  Prerequisites
