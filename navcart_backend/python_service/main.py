@@ -5,7 +5,6 @@ import logging
 
 app = FastAPI()
 
-# ✅ Allow CORS for frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://navcart.vercel.app"],

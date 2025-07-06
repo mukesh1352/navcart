@@ -9,6 +9,7 @@ import Signup from "../pages/signup";
 import Header from "../components/Header";
 import Map1 from "../pages/map1";
 import Home from "../pages/Home";
+import Finder from "../pages/Finder";
 
 // Layout Route (Root)
 const rootRoute = createRootRoute({
@@ -26,6 +27,12 @@ const Homeroute = createRoute({
   getParentRoute:()=>rootRoute,
   path:"/",
   component: Home,
+})
+
+const FinderRoute = createRoute({
+  getParentRoute:()=>rootRoute,
+  path:"/finder",
+  component:Finder
 })
 
 // /login
@@ -48,6 +55,6 @@ const maproute = createRoute({
   component:Map1
 })
 // Route tree
-const routeTree = rootRoute.addChildren([loginRoute, signupRoute,maproute,Homeroute]);
+const routeTree = rootRoute.addChildren([loginRoute, signupRoute,maproute,Homeroute,FinderRoute]);
 
 export const router = createRouter({ routeTree });
