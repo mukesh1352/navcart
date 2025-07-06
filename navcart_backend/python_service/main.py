@@ -3,8 +3,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from neo4j import GraphDatabase
 import networkx as nx
 import uvicorn
+from contextlib import asynccontextmanager
+
 
 app = FastAPI()
+driver = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global driver
+    driver = GraphDatabase.driver(URI, auth=AUTH)
+    driver.verify_connectivity()
+    yield
+    driver.close()
+
+app = FastAPI(lifespan=lifespan)
+
 
 # Allow all CORS for testing
 app.add_middleware(
@@ -18,21 +32,6 @@ app.add_middleware(
 URI = "neo4j+s://e26e2102.databases.neo4j.io"
 AUTH = ("neo4j", "igmb8yB0xLB6Gkk0tGY4AH_6D9mjfCbt7kJs-2sfxAk")  # Replace with real credentials
 driver = None  # Will be initialized on startup
-
-
-@app.on_event("startup")
-def startup_event():
-    global driver
-    driver = GraphDatabase.driver(URI, auth=AUTH)
-    driver.verify_connectivity()
-
-
-@app.on_event("shutdown")
-def shutdown_event():
-    global driver
-    if driver is not None:
-        driver.close()
-
 
 # Fetch graph from Neo4j and include names
 def fetch_graph_from_db():
