@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const BACKEND_URL = "http://localhost:8000";
-
+const BACKEND_URL = "https://navcart-python.onrender.com";
 
 type Node = {
   id: string;
