@@ -23,7 +23,7 @@ app = FastAPI(lifespan=lifespan)
 # Allow CORS (for frontend testing)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://yourdomain.com"],
+    allow_origins=["http://localhost:3000", "https://navcart.vercel.app/"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
