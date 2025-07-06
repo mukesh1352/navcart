@@ -7,7 +7,7 @@ app = FastAPI()
 # ✅ Allow CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or restrict to your frontend URL
+    allow_origins='https://navcart.vercel.app',  # or restrict to your frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
