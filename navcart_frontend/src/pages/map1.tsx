@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
+const BACKEND_URL = "http://localhost:8000";
+
+
 type Node = {
   id: string;
   x?: number;
@@ -28,45 +31,57 @@ const Map1: React.FC = () => {
   const [source, setSource] = useState<string>("");
   const [target, setTarget] = useState<string>("");
   const [totalDistance, setTotalDistance] = useState<number | null>(null);
+  const [path, setPath] = useState<string[]>([]);
+
+  const fetchGraph = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/graph`);
+      const data = await res.json();
+      setNodes(data.nodes);
+      setEdges(data.edges);
+      setPath([]);
+      setTotalDistance(null);
+    } catch (error) {
+      console.error("Error fetching graph data:", error);
+    }
+  };
+
+  const fetchShortestPath = async () => {
+    if (!source || !target) return;
+    try {
+      const res = await fetch(
+        `${BACKEND_URL}/shortest-path?source=${source}&target=${target}`
+      );
+      const data = await res.json();
+      setPath(data.path || []);
+      setTotalDistance(data.total_weight ?? null);
+    } catch (error) {
+      console.error("Error fetching shortest path:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchGraph = () => {
-      fetch("https://navcart-python.onrender.com/graph")
-        .then((res) => res.json())
-        .then((data) => {
-          setNodes(data.nodes);
-          setEdges(data.edges);
-          drawGraph(data.nodes, data.edges, []);
-          setTotalDistance(null);
-        });
-    };
-
     fetchGraph();
     const intervalId = setInterval(fetchGraph, 10000);
     return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
-    if (!source || !target) return;
+    fetchShortestPath();
+  }, [source, target]);
 
-    fetch(`https://navcart-python.onrender.com/shortest-path?source=${source}&target=${target}`)
-
-      .then((res) => res.json())
-      .then((data) => {
-        drawGraph(nodes, edges, data.path || []);
-        setTotalDistance(data.total_weight ?? null);
-      });
-  }, [source, target, nodes, edges]);
+  useEffect(() => {
+    drawGraph(nodes, edges, path);
+  }, [nodes, edges, path]);
 
   const drawGraph = (nodes: Node[], edges: Edge[], path: string[]) => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
+
     const width = +svg.attr("width")!;
     const height = +svg.attr("height")!;
 
-    const nodeMap = new Map<string, Node>();
-    nodes.forEach((n) => nodeMap.set(n.id, n));
-
+    const nodeMap = new Map(nodes.map((n) => [n.id, n]));
     const d3Edges: D3Edge[] = edges.map((e) => ({
       source: nodeMap.get(e.source)!,
       target: nodeMap.get(e.target)!,
@@ -76,37 +91,49 @@ const Map1: React.FC = () => {
     const simulation = d3
       .forceSimulation(nodes)
       .force("link", d3.forceLink<Node, D3Edge>(d3Edges).id((d) => d.id).distance(100))
-      .force("charge", d3.forceManyBody().strength(-300))
+      .force("charge", d3.forceManyBody().strength(-350))
       .force("center", d3.forceCenter(width / 2, height / 2));
 
     const defs = svg.append("defs");
-
-    defs.append("marker")
+    defs
+      .append("marker")
       .attr("id", "arrowhead")
       .attr("viewBox", "-0 -5 10 10")
-      .attr("refX", 22)
+      .attr("refX", 20)
       .attr("refY", 0)
       .attr("orient", "auto")
       .attr("markerWidth", 6)
       .attr("markerHeight", 6)
       .attr("xoverflow", "visible")
-      .append("svg:path")
+      .append("path")
       .attr("d", "M 0,-5 L 10 ,0 L 0,5")
-      .attr("fill", "#999")
-      .style("stroke", "none");
+      .attr("fill", "#999");
+
+    const isEdgeInPath = (sourceId: string, targetId: string) => {
+      const sIdx = path.indexOf(sourceId);
+      const tIdx = path.indexOf(targetId);
+      return Math.abs(sIdx - tIdx) === 1;
+    };
 
     const link = svg
       .append("g")
-      .attr("stroke-linecap", "round")
       .selectAll("line")
       .data(d3Edges)
       .enter()
       .append("line")
       .attr("stroke", (d) =>
-        path.includes(d.source.id) && path.includes(d.target.id) ? "#ef4444" : "#bbb"
+        path.includes(d.source.id) &&
+        path.includes(d.target.id) &&
+        isEdgeInPath(d.source.id, d.target.id)
+          ? "#ef4444"
+          : "#bbb"
       )
       .attr("stroke-width", (d) =>
-        path.includes(d.source.id) && path.includes(d.target.id) ? 3 : 2
+        path.includes(d.source.id) &&
+        path.includes(d.target.id) &&
+        isEdgeInPath(d.source.id, d.target.id)
+          ? 3
+          : 2
       )
       .attr("marker-end", "url(#arrowhead)");
 
@@ -118,9 +145,8 @@ const Map1: React.FC = () => {
       .append("text")
       .text((d) => d.weight)
       .attr("font-size", 11)
-      .attr("fill", "#666")
-      .attr("text-anchor", "middle")
-      .attr("dy", -8);
+      .attr("fill", "#555")
+      .attr("text-anchor", "middle");
 
     const node = svg
       .append("g")
@@ -166,7 +192,6 @@ const Map1: React.FC = () => {
       .append("text")
       .text((d) => d.id)
       .attr("font-size", 12)
-      .attr("font-family", "sans-serif")
       .attr("dx", 18)
       .attr("dy", ".35em")
       .attr("fill", "#222");
@@ -180,7 +205,6 @@ const Map1: React.FC = () => {
 
       node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
       label.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
-
       edgeLabels
         .attr("x", (d) => (d.source.x! + d.target.x!) / 2)
         .attr("y", (d) => (d.source.y! + d.target.y!) / 2 - 5);
@@ -191,21 +215,13 @@ const Map1: React.FC = () => {
     <div style={{ fontFamily: "Inter, sans-serif", padding: "1.5rem", maxWidth: 1000, margin: "auto" }}>
       <h2 style={{ marginBottom: "1rem", fontSize: "1.8rem", color: "#111" }}>🧭 NavCart Path Finder</h2>
 
-      <div
-        style={{
-          marginBottom: "1rem",
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          gap: "1rem",
-        }}
-      >
+      <div style={{ marginBottom: "1rem", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
         <div>
           <label style={{ fontWeight: 500 }}>From:</label>
           <select
-            style={{ marginLeft: "0.5rem", padding: "0.3rem 0.6rem", borderRadius: 6 }}
-            onChange={(e) => setSource(e.target.value)}
             value={source}
+            onChange={(e) => setSource(e.target.value)}
+            style={{ marginLeft: "0.5rem", padding: "0.3rem 0.6rem", borderRadius: 6 }}
           >
             <option value="">Select</option>
             {nodes.map((n) => (
@@ -219,9 +235,9 @@ const Map1: React.FC = () => {
         <div>
           <label style={{ fontWeight: 500 }}>To:</label>
           <select
-            style={{ marginLeft: "0.5rem", padding: "0.3rem 0.6rem", borderRadius: 6 }}
-            onChange={(e) => setTarget(e.target.value)}
             value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            style={{ marginLeft: "0.5rem", padding: "0.3rem 0.6rem", borderRadius: 6 }}
           >
             <option value="">Select</option>
             {nodes.map((n) => (
@@ -258,7 +274,7 @@ const Map1: React.FC = () => {
           borderRadius: "10px",
           background: "#f9fafb",
         }}
-      ></svg>
+      />
     </div>
   );
 };

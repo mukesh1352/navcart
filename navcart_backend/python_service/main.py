@@ -5,9 +5,10 @@ import networkx as nx
 import uvicorn
 from contextlib import asynccontextmanager
 
-
-app = FastAPI()
 driver = None
+
+URI = "neo4j+s://e26e2102.databases.neo4j.io"
+AUTH = ("neo4j", "igmb8yB0xLB6Gkk0tGY4AH_6D9mjfCbt7kJs-2sfxAk")  # Replace with real credentials
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,21 +20,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-
-# Allow all CORS for testing
+# Allow CORS (for frontend testing)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "https://yourdomain.com"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Neo4j Aura connection
-URI = "neo4j+s://e26e2102.databases.neo4j.io"
-AUTH = ("neo4j", "igmb8yB0xLB6Gkk0tGY4AH_6D9mjfCbt7kJs-2sfxAk")  # Replace with real credentials
-driver = None  # Will be initialized on startup
-
-# Fetch graph from Neo4j and include names
+# Fetch entire graph (CONNECTED & CONTAINS)
 def fetch_graph_from_db():
     G = nx.DiGraph()
     with driver.session(database="neo4j") as session:
@@ -46,13 +41,23 @@ def fetch_graph_from_db():
         for record in result:
             source = record["source"]
             target = record["target"]
-            G.add_node(source, name=record["source_name"])
-            G.add_node(target, name=record["target_name"])
-            G.add_edge(source, target, weight=record["weight"])
+            source_name = record["source_name"]
+            target_name = record["target_name"]
+            weight = record["weight"]
+
+            if source is None or target is None:
+                print(f"Skipping invalid record: {record}")
+                continue
+
+            G.add_node(source, name=source_name)
+            G.add_node(target, name=target_name)
+            G.add_edge(source, target, weight=weight)
     return G
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
-# Return the graph as nodes and edges
 @app.get("/graph")
 def get_graph():
     G = fetch_graph_from_db()
@@ -63,8 +68,6 @@ def get_graph():
     ]
     return {"nodes": nodes, "edges": edges}
 
-
-# Shortest path endpoint
 @app.get("/shortest-path")
 def shortest_path(source: str = Query(...), target: str = Query(...)):
     G = fetch_graph_from_db()
@@ -92,7 +95,6 @@ def shortest_path(source: str = Query(...), target: str = Query(...)):
             weight = G[u][v]["weight"]
             edge_path.append({"source": u, "target": v, "weight": weight})
 
-        # Get readable labels for the path
         labels = [G.nodes[n].get("name", n) for n in path]
 
         return {
@@ -104,7 +106,6 @@ def shortest_path(source: str = Query(...), target: str = Query(...)):
 
     except nx.NetworkXNoPath:
         return {"error": f"No path found from '{source}' to '{target}'"}
-
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
