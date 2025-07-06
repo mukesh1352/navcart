@@ -10,6 +10,7 @@ import Header from "../components/Header";
 import Map1 from "../pages/map1";
 import Home from "../pages/Home";
 import Finder from "../pages/Finder";
+import MultiItemFinder from "../pages/MultiFinder";
 
 // Layout Route (Root)
 const rootRoute = createRootRoute({
@@ -22,6 +23,12 @@ const rootRoute = createRootRoute({
 });
 
 //Home page
+
+const Multifinderroute = createRoute({
+  getParentRoute:()=>rootRoute,
+  path:"/multifinder",
+  component:MultiItemFinder
+})
 
 const Homeroute = createRoute({
   getParentRoute:()=>rootRoute,
@@ -55,6 +62,6 @@ const maproute = createRoute({
   component:Map1
 })
 // Route tree
-const routeTree = rootRoute.addChildren([loginRoute, signupRoute,maproute,Homeroute,FinderRoute]);
+const routeTree = rootRoute.addChildren([loginRoute, signupRoute,maproute,Homeroute,FinderRoute,Multifinderroute]);
 
 export const router = createRouter({ routeTree });
