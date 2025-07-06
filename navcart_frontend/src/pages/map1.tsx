@@ -29,17 +29,47 @@ const Map1: React.FC = () => {
   const [target, setTarget] = useState<string>("");
   const [totalDistance, setTotalDistance] = useState<number | null>(null);
   const [path, setPath] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchGraph = async () => {
     try {
       const res = await fetch(`https://navcart-python.onrender.com/graph`);
       const data = await res.json();
+
+      if (!data || !Array.isArray(data.nodes) || !Array.isArray(data.edges)) {
+        throw new Error("Invalid data format");
+      }
+
       setNodes(data.nodes);
       setEdges(data.edges);
       setPath([]);
       setTotalDistance(null);
-    } catch (error) {
+      setError(null);
+    } catch (error: unknown) {
       console.error("Error fetching graph data:", error);
+      setError("❌ Failed to fetch graph data. Please try again later.");
+    }
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchShortestPath = async () => {
+    if (!source || !target) return;
+    try {
+      const res = await fetch(
+        `https://navcart-python.onrender.com/shortest-path?source=${source}&target=${target}`
+      );
+      const data = await res.json();
+
+      if (!data.path || typeof data.total_weight !== "number") {
+        throw new Error("Invalid shortest-path response");
+      }
+
+      setPath(data.path);
+      setTotalDistance(data.total_weight);
+      setError(null);
+    } catch (error: unknown) {
+      console.error("Error fetching shortest path:", error);
+      setError("❌ Failed to fetch shortest path.");
     }
   };
 
@@ -50,24 +80,13 @@ const Map1: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const fetchShortestPath = async () => {
-      if (!source || !target) return;
-      try {
-        const res = await fetch(
-          `https://navcart-python.onrender.com/shortest-path?source=${source}&target=${target}`
-        );
-        const data = await res.json();
-        setPath(data.path || []);
-        setTotalDistance(data.total_weight ?? null);
-      } catch (error) {
-        console.error("Error fetching shortest path:", error);
-      }
-    };
     fetchShortestPath();
-  }, [source, target]);
+  }, [fetchShortestPath, source, target]);
 
   useEffect(() => {
-    drawGraph(nodes, edges, path);
+    if (nodes.length && edges.length) {
+      drawGraph(nodes, edges, path);
+    }
   }, [nodes, edges, path]);
 
   const drawGraph = (nodes: Node[], edges: Edge[], path: string[]) => {
@@ -90,8 +109,8 @@ const Map1: React.FC = () => {
       .force("charge", d3.forceManyBody().strength(-350))
       .force("center", d3.forceCenter(width / 2, height / 2));
 
-    const defs = svg.append("defs");
-    defs
+    svg
+      .append("defs")
       .append("marker")
       .attr("id", "arrowhead")
       .attr("viewBox", "-0 -5 10 10")
@@ -245,6 +264,12 @@ const Map1: React.FC = () => {
         </div>
       </div>
 
+      {error && (
+        <div style={{ color: "#b91c1c", background: "#fee2e2", padding: "0.6rem", borderRadius: 8, marginBottom: "1rem" }}>
+          {error}
+        </div>
+      )}
+
       {totalDistance !== null && (
         <div
           style={{
@@ -261,16 +286,7 @@ const Map1: React.FC = () => {
         </div>
       )}
 
-      <svg
-        ref={svgRef}
-        width={900}
-        height={600}
-        style={{
-          border: "1px solid #e5e7eb",
-          borderRadius: "10px",
-          background: "#f9fafb",
-        }}
-      />
+      <svg ref={svgRef} width={900} height={600} style={{ border: "1px solid #ccc", borderRadius: 8 }} />
     </div>
   );
 };
