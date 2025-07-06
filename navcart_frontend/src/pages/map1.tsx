@@ -45,6 +45,7 @@ const Map1: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchShortestPath = async () => {
     if (!source || !target) return;
     try {
@@ -67,7 +68,7 @@ const Map1: React.FC = () => {
 
   useEffect(() => {
     fetchShortestPath();
-  }, [source, target]);
+  }, [fetchShortestPath, source, target]);
 
   useEffect(() => {
     drawGraph(nodes, edges, path);
