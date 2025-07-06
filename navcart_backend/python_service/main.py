@@ -57,6 +57,12 @@ async def get_graph():
 @app.get("/shortest-path")
 async def get_shortest_path(source: str = Query(...), target: str = Query(...)):
     try:
+        if source == target:
+            return {
+                "path": [source],
+                "total_weight": 0
+            }
+
         with driver.session() as session:
             path_result = session.run(
                 """
@@ -79,7 +85,7 @@ async def get_shortest_path(source: str = Query(...), target: str = Query(...)):
                 "total_weight": total_weight
             }
 
-    except Exception as e:  # noqa: F841
+    except Exception:
         logging.exception("Error computing shortest path")
         raise HTTPException(status_code=500, detail="Failed to compute shortest path")
 
