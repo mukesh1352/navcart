@@ -9,6 +9,7 @@ import {
   Utensils,
   Car,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const Index = () => {
   useEffect(() => {
@@ -107,51 +108,58 @@ const Index = () => {
 
   const weeklyDeals = [
     {
-      date: "Mon–Wed",
-      title: "Fresh Produce Sale",
-      discount: "20% OFF",
+      title: "Buy 1 Get 1 Free",
+      date: "July 8 - July 14",
+      discount: "100% on second item",
     },
     {
-      date: "Thu–Fri",
-      title: "Electronics Clearance",
-      discount: "Up to 30% OFF",
+      title: "Fresh Fruits Offer",
+      date: "July 8 - July 10",
+      discount: "Up to 40% off",
     },
     {
-      date: "Weekend",
-      title: "Kids Items Special",
-      discount: "Buy 2 Get 1 FREE",
+      title: "Fashion Fiesta",
+      date: "July 11 - July 14",
+      discount: "Flat 30% off",
     },
   ];
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
       {/* Hero Section */}
-      {/* Hero Section */}
-<section className="relative h-[90vh] bg-[url('/public/image3.png')] bg-cover bg-center flex items-center justify-center text-white">
-  <div className="absolute inset-0 bg-black/50" />
-
-  {/* Background image behind the NavCart title */}
-  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-20">
-  </div>
-
-  <div className="relative z-10 text-center space-y-6 px-4 max-w-3xl">
-    <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">
-      NavCart
-    </h1>
-    <p className="text-xl md:text-2xl font-light">Where life begins</p>
-    <div className="flex flex-wrap justify-center gap-4 pt-4">
-      <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white">
-        <MapPin className="w-5 h-5" />
-        Store Locator
-      </button>
-      <button className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white text-white hover:bg-white hover:text-black transition">
-        <Calendar className="w-5 h-5" />
-        Weekly Deals
-      </button>
-    </div>
-  </div>
-</section>
-
+      <section className="relative h-[90vh] bg-[url('/public/image3.png')] bg-cover bg-center flex items-center justify-center text-white">
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center space-y-6 px-4 max-w-3xl">
+          <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">
+            NavCart
+          </h1>
+          <p className="text-xl md:text-2xl font-light">Where life begins</p>
+          <div className="flex flex-wrap justify-center gap-4 pt-4">
+            <Link
+              to="/store-locator"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white"
+            >
+              <MapPin className="w-5 h-5" />
+              Store Locator
+            </Link>
+            <Link
+              to="/map"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white text-white hover:bg-white hover:text-black transition"
+            >
+              <Calendar className="w-5 h-5" />
+              Store-Map
+            </Link>
+          </div>
+          <div className="pt-4">
+            <Link
+              to="/finder"
+              className="inline-block mt-4 px-6 py-3 rounded-xl bg-green-500 hover:bg-green-600 transition text-white font-semibold"
+            >
+              Department Segregator
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Stats Section */}
       <section className="py-16 bg-gray-50">
@@ -234,7 +242,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Weekly Deals Section */}
+      {/* Weekly Deals */}
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
