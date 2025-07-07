@@ -127,7 +127,7 @@ const Index = () => {
     <div className="min-h-screen bg-white text-gray-900 font-sans">
       {/* Hero Section */}
       {/* Hero Section */}
-<section className="relative h-[90vh] bg-[url('/Users/mukesh/Documents/projects/navcart/navcart_frontend/public/image3.png')] bg-cover bg-center flex items-center justify-center text-white">
+<section className="relative h-[90vh] bg-[url('/public/image3.png')] bg-cover bg-center flex items-center justify-center text-white">
   <div className="absolute inset-0 bg-black/50" />
 
   {/* Background image behind the NavCart title */}
