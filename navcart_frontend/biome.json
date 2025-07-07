@@ -1,0 +1,12 @@
+{
+  "$schema": "/Users/mukesh/Documents/projects/navcart/navcart_frontend/biome.json",
+  "formatter":{
+    "enabled":false
+  },
+  "linter":{
+    "enabled":false
+  },
+  "rules":{
+    "recommended":true
+  }
+}
