@@ -126,25 +126,37 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
       {/* Hero Section */}
-      <section className="relative h-[90vh] bg-[url('/images/hero-bg.jpg')] bg-cover bg-center flex items-center justify-center text-white">
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 text-center space-y-6 px-4 max-w-3xl">
-          <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">
-            NavCart
-          </h1>
-          <p className="text-xl md:text-2xl font-light">Where life begins</p>
-          <div className="flex flex-wrap justify-center gap-4 pt-4">
-            <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white">
-              <MapPin className="w-5 h-5" />
-              Store Locator
-            </button>
-            <button className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white text-white hover:bg-white hover:text-black transition">
-              <Calendar className="w-5 h-5" />
-              Weekly Deals
-            </button>
-          </div>
-        </div>
-      </section>
+      {/* Hero Section */}
+<section className="relative h-[90vh] bg-[url('/Users/mukesh/Documents/projects/navcart/navcart_frontend/public/image3.png')] bg-cover bg-center flex items-center justify-center text-white">
+  <div className="absolute inset-0 bg-black/50" />
+
+  {/* Background image behind the NavCart title */}
+  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-20">
+    <img
+      src="/images/navcart-logo-bg.png" // <-- replace with your image path
+      alt="NavCart Background"
+      className="w-72 h-72 object-contain"
+    />
+  </div>
+
+  <div className="relative z-10 text-center space-y-6 px-4 max-w-3xl">
+    <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">
+      NavCart
+    </h1>
+    <p className="text-xl md:text-2xl font-light">Where life begins</p>
+    <div className="flex flex-wrap justify-center gap-4 pt-4">
+      <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white">
+        <MapPin className="w-5 h-5" />
+        Store Locator
+      </button>
+      <button className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white text-white hover:bg-white hover:text-black transition">
+        <Calendar className="w-5 h-5" />
+        Weekly Deals
+      </button>
+    </div>
+  </div>
+</section>
+
 
       {/* Stats Section */}
       <section className="py-16 bg-gray-50">
