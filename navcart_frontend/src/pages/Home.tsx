@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import {
   MapPin,
   Clock,
-  Mail,
   Calendar,
   Star,
   Users,
