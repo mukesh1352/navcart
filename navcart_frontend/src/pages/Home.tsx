@@ -132,11 +132,6 @@ const Index = () => {
 
   {/* Background image behind the NavCart title */}
   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-20">
-    <img
-      src="/images/navcart-logo-bg.png" // <-- replace with your image path
-      alt="NavCart Background"
-      className="w-72 h-72 object-contain"
-    />
   </div>
 
   <div className="relative z-10 text-center space-y-6 px-4 max-w-3xl">
