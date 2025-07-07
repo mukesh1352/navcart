@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import Footer from "../components/Footer";
 import {
   MapPin,
   Clock,
@@ -106,12 +107,12 @@ const Index = () => {
 
   const weeklyDeals = [
     {
-      date: "Mon-Wed",
+      date: "Mon–Wed",
       title: "Fresh Produce Sale",
       discount: "20% OFF",
     },
     {
-      date: "Thu-Fri",
+      date: "Thu–Fri",
       title: "Electronics Clearance",
       discount: "Up to 30% OFF",
     },
@@ -124,22 +125,20 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
-      {/* Hero */}
+      {/* Hero Section */}
       <section className="relative h-[90vh] bg-[url('/images/hero-bg.jpg')] bg-cover bg-center flex items-center justify-center text-white">
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        <div className="relative z-10 text-center space-y-6 max-w-3xl px-4">
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center space-y-6 px-4 max-w-3xl">
           <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">
             NavCart
           </h1>
-          <p className="text-xl md:text-2xl font-light">
-            Where life begins
-          </p>
+          <p className="text-xl md:text-2xl font-light">Where life begins</p>
           <div className="flex flex-wrap justify-center gap-4 pt-4">
-            <button className="btn btn-primary text-white flex items-center gap-2 px-6 py-3 rounded-xl hover:bg-primary/90 transition">
+            <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white">
               <MapPin className="w-5 h-5" />
               Store Locator
             </button>
-            <button className="btn border border-white text-white flex items-center gap-2 px-6 py-3 rounded-xl hover:bg-white hover:text-black transition">
+            <button className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white text-white hover:bg-white hover:text-black transition">
               <Calendar className="w-5 h-5" />
               Weekly Deals
             </button>
@@ -147,7 +146,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Stats Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
@@ -155,8 +154,8 @@ const Index = () => {
             ["100K+", "Products"],
             ["25K+", "Daily Customers"],
             ["24/7", "Open Locations"],
-          ].map(([value, label], i) => (
-            <div key={i}>
+          ].map(([value, label], index) => (
+            <div key={index}>
               <div className="text-4xl font-extrabold text-blue-600">{value}</div>
               <p className="text-gray-600">{label}</p>
             </div>
@@ -164,14 +163,12 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Departments */}
+      {/* Departments Section */}
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-2">Shop by Department</h2>
-            <p className="text-lg text-gray-600">
-              Explore categories crafted for convenience
-            </p>
+            <p className="text-lg text-gray-600">Explore categories crafted for convenience</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {departments.map((dept, i) => (
@@ -206,14 +203,12 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Services */}
+      {/* Services Section */}
       <section className="bg-gray-100 py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-2">In-Store Services</h2>
-            <p className="text-lg text-gray-600">
-              Extra convenience at your fingertips
-            </p>
+            <p className="text-lg text-gray-600">Extra convenience at your fingertips</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service, i) => (
@@ -232,14 +227,12 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Weekly Deals */}
+      {/* Weekly Deals Section */}
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-2">This Week’s Deals</h2>
-            <p className="text-lg text-gray-600">
-              Limited-time offers you’ll love
-            </p>
+            <p className="text-lg text-gray-600">Limited-time offers you’ll love</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {weeklyDeals.map((deal, i) => (
@@ -260,6 +253,8 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };
