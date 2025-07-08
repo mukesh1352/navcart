@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 
 const Login = () => {
@@ -6,6 +6,27 @@ const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Check if user session exists
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch('https://navcart.onrender.com/api/me', {
+          method: 'GET',
+          credentials: 'include', // Include session cookie
+        });
+        const data = await res.json();
+        if (res.ok && data.loggedIn) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+          navigate({ to: '/' });
+        }
+      } catch (err) {
+        console.error('Session check failed:', err);
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,6 +40,7 @@ const Login = () => {
       const response = await fetch('https://navcart.onrender.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Important to include session cookie
         body: JSON.stringify(formData),
       });
 
@@ -26,17 +48,19 @@ const Login = () => {
 
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
-      } 
+      }
+
+      // Save to localStorage
+      localStorage.setItem('user', JSON.stringify(data.user));
       setSuccess('Login successful!');
       setTimeout(() => navigate({ to: '/' }), 1000);
     } catch (err) {
-  if (err instanceof Error) {
-    setError(err.message);
-  } else {
-    setError('An unknown error occurred');
-  }
-}
-
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
   };
 
   return (
