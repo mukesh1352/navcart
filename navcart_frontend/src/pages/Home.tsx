@@ -136,7 +136,7 @@ const Index = () => {
     {/* Top buttons */}
     <div className="flex flex-wrap justify-center gap-4 pt-4">
       <Link
-        to="/store-locator"
+        to="/storelocator"
         className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white"
       >
         <MapPin className="w-5 h-5" />
