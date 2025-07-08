@@ -37,13 +37,30 @@ app.use(
 );
 
 // CORS Config
+const cors = require("cors");
+
+const allowedOrigins = [process.env.FRONTEND_ORIGIN, 'http://localhost:3000'];
+
 const corsOptions = {
-  origin: process.env.FRONTEND_ORIGIN,
-  methods: ['GET', 'POST'],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   credentials: true,
   optionsSuccessStatus: 200,
 };
+
 app.use(cors(corsOptions));
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 
 // MongoDB Connection
 mongoose
@@ -137,4 +154,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-  
