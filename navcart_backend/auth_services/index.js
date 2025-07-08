@@ -6,6 +6,7 @@ const cors = require('cors');
 const Redis = require('ioredis');
 const connectRedis = require('connect-redis');
 const session = require('express-session');
+const path = require('path');
 
 // App & Middleware
 const app = express();
@@ -24,7 +25,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // Set to true if using HTTPS in production
+    secure: process.env.NODE_ENV === 'production', // true only in production
     sameSite: 'Lax',
   }
 }));
@@ -110,6 +111,18 @@ app.get('/api/me', (req, res) => {
     return res.status(401).json({ loggedIn: false });
   }
 });
+
+
+// 🟡 Serve Frontend in Production
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, 'client', 'build');
+  app.use(express.static(clientBuildPath));
+
+  // Catch-all handler to return index.html for any unknown route
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
 
 // Start Server
 const PORT = process.env.PORT || 3000;
