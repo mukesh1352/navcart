@@ -11,7 +11,6 @@ import Map1 from "../pages/map1";
 import Home from "../pages/Home";
 import Finder from "../pages/Finder";
 import MultiItemFinder from "../pages/MultiFinder";
-import storelocator from "../pages/storelocator";
 
 // Layout Route (Root)
 const rootRoute = createRootRoute({
@@ -25,11 +24,6 @@ const rootRoute = createRootRoute({
 
 //Home page
 
-const storelocatorroute = createRoute({
-  getParentRoute:()=>rootRoute,
-  path:"/storelocator",
-  component:storelocator
-})
 const Multifinderroute = createRoute({
   getParentRoute:()=>rootRoute,
   path:"/multifinder",
@@ -68,6 +62,6 @@ const maproute = createRoute({
   component:Map1
 })
 // Route tree
-const routeTree = rootRoute.addChildren([loginRoute, signupRoute,maproute,Homeroute,FinderRoute,Multifinderroute,storelocatorroute]);
+const routeTree = rootRoute.addChildren([loginRoute, signupRoute,maproute,Homeroute,FinderRoute,Multifinderroute]);
 
 export const router = createRouter({ routeTree });
