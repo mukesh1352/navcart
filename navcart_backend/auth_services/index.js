@@ -37,16 +37,10 @@ app.use(
 );
 
 // CORS Config
-const cors = require("cors");
-
-
-const allowedOrigins = ["https://navcart.vercel.app"];
-
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true, // if you're sending cookies/auth tokens
-}));
-
+const corsOptions = {
+  origin: ["https://navcart.vercel.app"],
+  credentials: true,
+};
 
 app.use(cors(corsOptions));
 
@@ -54,7 +48,6 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   next();
 });
-
 
 // MongoDB Connection
 mongoose
