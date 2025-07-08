@@ -7,17 +7,18 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Check if user session exists
+  // Auto-login if session cookie is still valid
   useEffect(() => {
     const checkSession = async () => {
       try {
         const res = await fetch('https://navcart.onrender.com/api/me', {
           method: 'GET',
-          credentials: 'include', // Include session cookie
+          credentials: 'include',
         });
         const data = await res.json();
         if (res.ok && data.loggedIn) {
           localStorage.setItem('user', JSON.stringify(data.user));
+          window.dispatchEvent(new Event('storage')); // Notify other tabs/components
           navigate({ to: '/' });
         }
       } catch (err) {
@@ -40,7 +41,7 @@ const Login = () => {
       const response = await fetch('https://navcart.onrender.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Important to include session cookie
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -50,10 +51,13 @@ const Login = () => {
         throw new Error(data.message || 'Login failed');
       }
 
-      // Save to localStorage
       localStorage.setItem('user', JSON.stringify(data.user));
+
+      // Force notify Header of storage change
+      window.dispatchEvent(new Event('storage'));
+
       setSuccess('Login successful!');
-      setTimeout(() => navigate({ to: '/' }), 1000);
+      navigate({ to: '/' });
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
