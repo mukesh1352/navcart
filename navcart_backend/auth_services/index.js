@@ -1,50 +1,47 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const Redis = require('ioredis');
-const connect_redis = require('connect-redis');
+const connectRedis = require('connect-redis');
 const session = require('express-session');
 
 // App & Middleware
 const app = express();
 app.use(express.json());
 
-const saltrounds = 10;
-
 // Redis Setup
-const RedisStore = connect_redis(session);
-const redisClient = new Redis('redis://localhost:6379');
+const RedisStore = connectRedis(session);
+const redisClient = new Redis(process.env.REDIS_URL);
 
+// Session Setup
 app.use(session({
   name: 'navcart.sid',
   store: new RedisStore({ client: redisClient }),
-  secret: 'supersecretkey', // ✔️ Hardcoded for now
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // ❗ Since you're not using NODE_ENV='production'
-    sameSite: 'Lax', // ❗ Match the `secure` value
+    secure: false, // Set to true if using HTTPS in production
+    sameSite: 'Lax',
   }
 }));
 
 // CORS Config
 const corsOptions = {
-  origin: 'https://navcart.vercel.app', // ✔️ Update if needed for localhost testing
+  origin: process.env.FRONTEND_ORIGIN,
   methods: ['GET', 'POST'],
   credentials: true,
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
 
-// Port & Mongo
-const port = 3000;
-const mongoURL = 'mongodb://localhost:27017/navcartdb'; // ✔️ Hardcoded for now
-
-mongoose.connect(mongoURL)
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => {
+  .catch(err => {
     console.error("❌ MongoDB Connection Error:", err);
     process.exit(1);
   });
@@ -52,7 +49,7 @@ mongoose.connect(mongoURL)
 // User Schema
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
 });
 const User = mongoose.model('User', userSchema);
 
@@ -63,7 +60,7 @@ app.post('/api/signup', async (req, res) => {
     const existingUser = await User.findOne({ username });
     if (existingUser) return res.status(400).json({ message: "User already exists." });
 
-    const hashedPassword = await bcrypt.hash(password, saltrounds);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
@@ -105,7 +102,7 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
-// Session Check
+// Check Session
 app.get('/api/me', (req, res) => {
   if (req.session.user) {
     return res.status(200).json({ loggedIn: true, user: { username: req.session.user.username } });
@@ -115,6 +112,7 @@ app.get('/api/me', (req, res) => {
 });
 
 // Start Server
-app.listen(port, () => {
-  console.log(`🚀 Server listening on port ${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
