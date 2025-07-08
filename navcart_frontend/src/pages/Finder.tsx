@@ -98,7 +98,23 @@ const Finder = () => {
 
   return (
     <div className="max-w-5xl mx-auto mt-10 p-6 rounded-xl shadow-md bg-white space-y-6">
-      <h2 className="text-2xl font-bold text-center">🛒 Find Items by Floor & Department</h2>
+     <div className="text-center space-y-3">
+  <h2 className="text-3xl font-bold text-primary">🛒 Find Items by Floor & Department</h2>
+
+  <div className="alert alert-info justify-center mx-auto max-w-md shadow-md">
+    <span>
+      Looking for multiple items?&nbsp;
+      <a
+        href="/multifinder"
+        className="link link-hover link-secondary font-semibold"
+      >
+        Click here
+      </a>
+      .
+    </span>
+  </div>
+</div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">

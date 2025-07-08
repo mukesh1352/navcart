@@ -127,41 +127,50 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
       {/* Hero Section */}
-      <section className="relative h-[90vh] bg-[url('/public/image3.png')] bg-cover bg-center flex items-center justify-center text-white">
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 text-center space-y-6 px-4 max-w-3xl">
-          <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">
-            NavCart
-          </h1>
-          <p className="text-xl md:text-2xl font-light">Smart Shopping Starts Here.</p>
-          <div className="flex flex-wrap justify-center gap-4 pt-4">
-            <Link
-              to="/store-locator"
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white"
-            >
-              <MapPin className="w-5 h-5" />
-              Store Locator
-            </Link>
-            <Link
-              to="/map"
-              className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white text-white hover:bg-white hover:text-black transition"
-            >
-              <Calendar className="w-5 h-5" />
-              Store-Map
-            </Link>
-          </div>
-          <div className="pt-4">
-            <Link
-              to="/finder"
-              className="inline-block mt-4 px-6 py-3 rounded-xl bg-green-500 hover:bg-green-600 transition text-white font-semibold"
-            >
-              Department Segregator
-            </Link>
-          </div>
-        </div>
-      </section>
+      <section className="relative h-[90vh] bg-[url('/image3.png')] bg-cover bg-center flex items-center justify-center text-white">
+  <div className="absolute inset-0 bg-black/50" />
+  <div className="relative z-10 text-center space-y-6 px-4 max-w-3xl">
+    <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">NavCart</h1>
+    <p className="text-xl md:text-2xl font-light">Smart Shopping Starts Here.</p>
 
-      {/* Stats Section */}
+    {/* Top buttons */}
+    <div className="flex flex-wrap justify-center gap-4 pt-4">
+      <Link
+        to="/store-locator"
+        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition text-white"
+      >
+        <MapPin className="w-5 h-5" />
+        Store Locator
+      </Link>
+      <Link
+        to="/map"
+        className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white text-white hover:bg-white hover:text-black transition"
+      >
+        <Calendar className="w-5 h-5" />
+        Store Map
+      </Link>
+    </div>
+
+    {/* Bottom buttons */}
+    <div className="flex flex-wrap justify-center gap-4 pt-3">
+      <Link
+        to="/multifinder"
+        className="inline-block px-6 py-3 rounded-xl bg-green-500 hover:bg-green-600 transition text-white font-semibold"
+      >
+        Department Segregator
+      </Link>
+      <Link
+        to="/finder"
+        className="inline-block px-6 py-3 rounded-xl bg-green-500 hover:bg-green-600 transition text-white font-semibold"
+      >
+        Item Locator
+      </Link>
+    </div>
+  </div>
+</section>
+
+
+      {/* Stats */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
@@ -169,8 +178,8 @@ const Index = () => {
             ["100K+", "Products"],
             ["25K+", "Daily Customers"],
             ["24/7", "Open Locations"],
-          ].map(([value, label], index) => (
-            <div key={index}>
+          ].map(([value, label], i) => (
+            <div key={i}>
               <div className="text-4xl font-extrabold text-blue-600">{value}</div>
               <p className="text-gray-600">{label}</p>
             </div>
@@ -178,7 +187,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Departments Section */}
+      {/* Departments */}
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
@@ -194,10 +203,10 @@ const Index = () => {
                 <div
                   className="h-40 bg-cover bg-center flex items-center justify-center text-6xl"
                   style={{ backgroundImage: `url(${dept.image})` }}
+                  role="img"
+                  aria-label={dept.name}
                 >
-                  <span className="backdrop-blur bg-black/20 p-2 rounded-xl">
-                    {dept.icon}
-                  </span>
+                  <span className="backdrop-blur bg-black/20 p-2 rounded-xl">{dept.icon}</span>
                 </div>
                 <div className="p-5 space-y-2">
                   <div className="flex justify-between items-center">
@@ -218,7 +227,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* Services */}
       <section className="bg-gray-100 py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
@@ -260,9 +269,7 @@ const Index = () => {
                 </div>
                 <h3 className="text-lg font-semibold">{deal.title}</h3>
                 <p className="text-sm text-gray-500">{deal.date}</p>
-                <div className="text-lg font-bold text-blue-600 mt-1">
-                  {deal.discount}
-                </div>
+                <div className="text-lg font-bold text-blue-600 mt-2">{deal.discount}</div>
               </div>
             ))}
           </div>
