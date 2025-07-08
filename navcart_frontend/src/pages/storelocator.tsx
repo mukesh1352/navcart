@@ -1,9 +1,16 @@
-import { useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useEffect, useState } from 'react';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+} from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 import L, { type LatLngExpression } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'react-leaflet-markercluster/dist/styles.min.css';
 
-// Fix missing icon issue in Leaflet
+// Fix missing icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -12,54 +19,59 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-const stores = [
-  {
-    id: '1',
-    name: 'Bentonville Supercenter',
-    address: '102 N Walton Blvd',
-    city: 'Bentonville',
-    state: 'AR',
-    latitude: 36.3729,
-    longitude: -94.2088,
-  },
-  {
-    id: '2',
-    name: 'Tulsa Supercenter',
-    address: '8800 E Pine St',
-    city: 'Tulsa',
-    state: 'OK',
-    latitude: 36.114647,
-    longitude: -95.926383,
-  },
-  {
-    id: '3',
-    name: 'Atlanta Supercenter',
-    address: '235 Peachtree Rd NE',
-    city: 'Atlanta',
-    state: 'GA',
-    latitude: 33.762909,
-    longitude: -84.42348,
-  },
-];
-
 const storelocator = () => {
   const [showMap, setShowMap] = useState(false);
-  const center: LatLngExpression = [20, 0];
+  const [stores, setStores] = useState<any[]>([]);
+  const [search, setSearch] = useState('');
+  const center: LatLngExpression = [37.8, -96]; // US center
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const response = await fetch('/api/walmart-stores'); // Replace with actual backend or API
+        const data = await response.json();
+        setStores(data);
+      } catch (error) {
+        console.error('Failed to fetch stores:', error);
+      }
+    };
+
+    fetchStores();
+  }, []);
+
+  const filteredStores = stores.filter((store) =>
+    store.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div style={{ fontFamily: 'sans-serif', textAlign: 'center' }}>
       <h1>NavCart Store Locator</h1>
-      <button
-        onClick={() => setShowMap((v) => !v)}
-        style={{
-          padding: '0.5rem 1rem',
-          fontSize: '1rem',
-          cursor: 'pointer',
-          marginBottom: '1rem',
-        }}
-      >
-        {showMap ? 'Hide Map' : 'Show Walmart Store Locator'}
-      </button>
+
+      <div style={{ marginBottom: '1rem' }}>
+        <input
+          type="text"
+          placeholder="Search stores..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            padding: '0.5rem',
+            fontSize: '1rem',
+            borderRadius: 4,
+            border: '1px solid #ccc',
+            marginRight: 8,
+          }}
+        />
+        <button
+          onClick={() => setShowMap((v) => !v)}
+          style={{
+            padding: '0.5rem 1rem',
+            fontSize: '1rem',
+            cursor: 'pointer',
+          }}
+        >
+          {showMap ? 'Hide Map' : 'Show Walmart Store Locator'}
+        </button>
+      </div>
 
       {showMap && (
         <div
@@ -73,22 +85,27 @@ const storelocator = () => {
             boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
           }}
         >
-          <MapContainer center={center} zoom={2} style={{ height: '100%', width: '100%' }}>
+          <MapContainer center={center} zoom={4} style={{ height: '100%', width: '100%' }}>
             <TileLayer
               attribution="&copy; OpenStreetMap contributors"
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            {stores.map((store) => (
-              <Marker key={store.id} position={[store.latitude, store.longitude]}>
-                <Popup>
-                  <strong>{store.name}</strong>
-                  <br />
-                  {store.address}
-                  <br />
-                  {store.city}, {store.state}
-                </Popup>
-              </Marker>
-            ))}
+            <MarkerClusterGroup>
+              {filteredStores.map((store) => (
+                <Marker
+                  key={store.id}
+                  position={[store.latitude, store.longitude]}
+                >
+                  <Popup>
+                    <strong>{store.name}</strong>
+                    <br />
+                    {store.address}
+                    <br />
+                    {store.city}, {store.state}
+                  </Popup>
+                </Marker>
+              ))}
+            </MarkerClusterGroup>
           </MapContainer>
         </div>
       )}

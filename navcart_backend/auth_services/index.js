@@ -3,32 +3,38 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
-const Redis = require('ioredis');
-const connectRedis = require('connect-redis');
-const session = require('express-session');
 const path = require('path');
+
+const session = require('express-session');
+const RedisStore = require('connect-redis').default;
+const { createClient } = require('redis');
+
+// Redis Client (Node Redis v4)
+const redisClient = createClient({
+  legacyMode: true,
+  url: process.env.REDIS_URL || 'redis://localhost:6379',
+});
+redisClient.connect().catch(console.error);
 
 // App & Middleware
 const app = express();
 app.use(express.json());
 
-// Redis Setup
-const RedisStore = connectRedis(session);
-const redisClient = new Redis(process.env.REDIS_URL);
-
-// Session Setup
-app.use(session({
-  name: 'navcart.sid',
-  store: new RedisStore({ client: redisClient }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // true only in production
-    sameSite: 'Lax',
-  }
-}));
+// Session Middleware
+app.use(
+  session({
+    name: 'navcart.sid',
+    store: new RedisStore({ client: redisClient }),
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax',
+    },
+  })
+);
 
 // CORS Config
 const corsOptions = {
@@ -40,10 +46,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch(err => {
-    console.error("❌ MongoDB Connection Error:", err);
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch((err) => {
+    console.error('❌ MongoDB Connection Error:', err);
     process.exit(1);
   });
 
@@ -59,19 +66,20 @@ app.post('/api/signup', async (req, res) => {
   const { username, password } = req.body;
   try {
     const existingUser = await User.findOne({ username });
-    if (existingUser) return res.status(400).json({ message: "User already exists." });
+    if (existingUser)
+      return res.status(400).json({ message: 'User already exists.' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
     res.status(201).json({
-      message: "User created successfully.",
-      user: { username: newUser.username }
+      message: 'User created successfully.',
+      user: { username: newUser.username },
     });
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(400).json({ message: "Username already taken." });
+      return res.status(400).json({ message: 'Username already taken.' });
     }
     res.status(500).json({ message: err.message });
   }
@@ -82,13 +90,13 @@ app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ message: "User not found." });
+    if (!user) return res.status(400).json({ message: 'User not found.' });
 
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ message: "Invalid password." });
+    if (!valid) return res.status(401).json({ message: 'Invalid password.' });
 
     req.session.user = { username: user.username };
-    res.status(200).json({ message: "Login successful.", user: { username } });
+    res.status(200).json({ message: 'Login successful.', user: { username } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -96,29 +104,29 @@ app.post('/api/login', async (req, res) => {
 
 // Logout
 app.post('/api/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) return res.status(500).json({ message: "Logout failed." });
+  req.session.destroy((err) => {
+    if (err) return res.status(500).json({ message: 'Logout failed.' });
     res.clearCookie('navcart.sid');
-    res.status(200).json({ message: "Logged out" });
+    res.status(200).json({ message: 'Logged out' });
   });
 });
 
 // Check Session
 app.get('/api/me', (req, res) => {
   if (req.session.user) {
-    return res.status(200).json({ loggedIn: true, user: { username: req.session.user.username } });
+    return res
+      .status(200)
+      .json({ loggedIn: true, user: { username: req.session.user.username } });
   } else {
     return res.status(401).json({ loggedIn: false });
   }
 });
 
-
-// 🟡 Serve Frontend in Production
+// Serve Frontend in Production
 if (process.env.NODE_ENV === 'production') {
   const clientBuildPath = path.join(__dirname, 'client', 'build');
   app.use(express.static(clientBuildPath));
 
-  // Catch-all handler to return index.html for any unknown route
   app.get('*', (req, res) => {
     res.sendFile(path.join(clientBuildPath, 'index.html'));
   });
@@ -129,3 +137,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+  
