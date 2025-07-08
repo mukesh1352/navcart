@@ -5,7 +5,6 @@ const Header = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<{ username: string } | null>(null);
 
-  // Load user from localStorage or session
   useEffect(() => {
     const loadUser = async () => {
       const storedUser = localStorage.getItem('user');
@@ -56,11 +55,12 @@ const Header = () => {
 
   return (
     <header className="flex justify-between items-center p-4 bg-white shadow-md">
-      <h1 className="text-xl font-bold text-gray-800">NavCart</h1>
+      <Link to="/" className="text-xl font-bold text-gray-800 hover:text-blue-600 transition">
+        NavCart
+      </Link>
       <div className="space-x-4">
         {user ? (
           <>
-            <span className="text-gray-700">Hi, {user.username}</span>
             <button
               onClick={handleLogout}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
