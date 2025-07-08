@@ -13,7 +13,7 @@ import { Link } from "@tanstack/react-router";
 
 const Index = () => {
   useEffect(() => {
-    document.title = "Navcart | Where life begins";
+    document.title = "Navcart | Smart Shopping Starts Here.";
   }, []);
 
   const departments = [
@@ -133,7 +133,7 @@ const Index = () => {
           <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">
             NavCart
           </h1>
-          <p className="text-xl md:text-2xl font-light">Where life begins</p>
+          <p className="text-xl md:text-2xl font-light">Smart Shopping Starts Here.</p>
           <div className="flex flex-wrap justify-center gap-4 pt-4">
             <Link
               to="/store-locator"
