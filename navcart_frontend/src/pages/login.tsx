@@ -7,17 +7,18 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Check if user session exists
   useEffect(() => {
     const checkSession = async () => {
       try {
         const res = await fetch('https://navcart.onrender.com/api/me', {
           method: 'GET',
-          credentials: 'include',
+          credentials: 'include', // Include session cookie
         });
         const data = await res.json();
         if (res.ok && data.loggedIn) {
           localStorage.setItem('user', JSON.stringify(data.user));
-          window.location.href = '/'; // Refresh page on redirect
+          navigate({ to: '/' });
         }
       } catch (err) {
         console.error('Session check failed:', err);
@@ -25,7 +26,7 @@ const Login = () => {
     };
 
     checkSession();
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,7 +40,7 @@ const Login = () => {
       const response = await fetch('https://navcart.onrender.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        credentials: 'include', // Important to include session cookie
         body: JSON.stringify(formData),
       });
 
@@ -49,11 +50,16 @@ const Login = () => {
         throw new Error(data.message || 'Login failed');
       }
 
+      // Save to localStorage
       localStorage.setItem('user', JSON.stringify(data.user));
       setSuccess('Login successful!');
-      window.location.href = '/'; // Full refresh after login
+      setTimeout(() => navigate({ to: '/' }), 1000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     }
   };
 
@@ -78,10 +84,7 @@ const Login = () => {
             value={formData.password}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-          >
+          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
             Login
           </button>
         </form>
