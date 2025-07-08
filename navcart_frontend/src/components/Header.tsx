@@ -5,19 +5,34 @@ const Header = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<{ username: string } | null>(null);
 
-  // Load user from localStorage on mount
+  // Load user from localStorage or session
   useEffect(() => {
-    const loadUser = () => {
+    const loadUser = async () => {
       const storedUser = localStorage.getItem('user');
-      setUser(storedUser ? JSON.parse(storedUser) : null);
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        try {
+          const res = await fetch('https://navcart.onrender.com/api/me', {
+            credentials: 'include',
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setUser(data.user);
+            localStorage.setItem('user', JSON.stringify(data.user));
+          }
+        } catch (err) {
+          console.error('Failed to fetch session info:', err);
+        }
+      }
     };
 
     loadUser();
 
-    // Listen for login/logout from other tabs/windows
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'user') {
-        loadUser();
+        const updatedUser = localStorage.getItem('user');
+        setUser(updatedUser ? JSON.parse(updatedUser) : null);
       }
     };
 
@@ -32,7 +47,7 @@ const Header = () => {
         credentials: 'include',
       });
       localStorage.removeItem('user');
-      setUser(null); // Also update local state
+      setUser(null);
       navigate({ to: '/login' });
     } catch (err) {
       console.error('Logout failed:', err);
