@@ -39,20 +39,14 @@ app.use(
 // CORS Config
 const cors = require("cors");
 
-const allowedOrigins = [process.env.FRONTEND_ORIGIN, 'http://localhost:3000'];
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
+const allowedOrigins = ["https://navcart.vercel.app"];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true, // if you're sending cookies/auth tokens
+}));
+
 
 app.use(cors(corsOptions));
 
