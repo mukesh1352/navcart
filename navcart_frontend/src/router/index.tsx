@@ -12,6 +12,7 @@ import Home from "../pages/Home";
 import Finder from "../pages/Finder";
 import MultiItemFinder from "../pages/MultiFinder";
 import StoreLocator from "../pages/storelocator";
+import InventoryDashboard from "../pages/inventorydashboard";
 
 // Layout Route (Root)
 const rootRoute = createRootRoute({
@@ -22,6 +23,12 @@ const rootRoute = createRootRoute({
     </>
   ),
 });
+
+const inventoryroute = createRoute({
+  getParentRoute:()=>rootRoute,
+  path:"/inventory",
+  component:InventoryDashboard
+})
 
 //Home page
 const storelocatorroute = createRoute({
@@ -67,6 +74,6 @@ const maproute = createRoute({
   component:Map1
 })
 // Route tree
-const routeTree = rootRoute.addChildren([loginRoute, signupRoute,maproute,Homeroute,FinderRoute,Multifinderroute,storelocatorroute]);
+const routeTree = rootRoute.addChildren([loginRoute, signupRoute,maproute,Homeroute,FinderRoute,Multifinderroute,storelocatorroute,inventoryroute]);
 
 export const router = createRouter({ routeTree });
