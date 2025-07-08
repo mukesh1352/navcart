@@ -9,16 +9,29 @@ const session = require('express-session');
 const RedisStore = require('connect-redis').default;
 const { createClient } = require('redis');
 
-// Redis Client (Node Redis v4)
 const redisClient = createClient({
-  legacyMode: true,
   url: process.env.REDIS_URL || 'redis://localhost:6379',
 });
-redisClient.connect().catch(console.error);
 
-// App & Middleware
+redisClient.on('error', (err) => console.error('Redis Client Error', err));
+
+(async () => {
+  await redisClient.connect();
+})();
+
 const app = express();
 app.use(express.json());
+
+// CORS Config
+const corsOptions = {
+  origin: ['https://navcart.vercel.app'],
+  credentials: true,
+};
+app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  next();
+});
 
 // Session Middleware
 app.use(
@@ -35,19 +48,6 @@ app.use(
     },
   })
 );
-
-// CORS Config
-const corsOptions = {
-  origin: ["https://navcart.vercel.app"],
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  next();
-});
 
 // MongoDB Connection
 mongoose
@@ -130,7 +130,6 @@ app.get('/api/me', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   const clientBuildPath = path.join(__dirname, 'client', 'build');
   app.use(express.static(clientBuildPath));
-
   app.get('*', (req, res) => {
     res.sendFile(path.join(clientBuildPath, 'index.html'));
   });
