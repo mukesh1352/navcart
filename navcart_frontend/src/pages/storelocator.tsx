@@ -42,7 +42,7 @@ const stores = [
   },
 ];
 
-const App = () => {
+const storelocator = () => {
   const [showMap, setShowMap] = useState(false);
   const center: LatLngExpression = [20, 0];
 
@@ -96,4 +96,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default storelocator;
