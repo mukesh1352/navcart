@@ -7,7 +7,6 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Auto-login if session cookie is still valid
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -18,8 +17,7 @@ const Login = () => {
         const data = await res.json();
         if (res.ok && data.loggedIn) {
           localStorage.setItem('user', JSON.stringify(data.user));
-          window.dispatchEvent(new Event('storage')); // Notify other tabs/components
-          navigate({ to: '/' });
+          window.location.href = '/'; // Refresh page on redirect
         }
       } catch (err) {
         console.error('Session check failed:', err);
@@ -27,7 +25,7 @@ const Login = () => {
     };
 
     checkSession();
-  }, [navigate]);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -52,18 +50,10 @@ const Login = () => {
       }
 
       localStorage.setItem('user', JSON.stringify(data.user));
-
-      // Force notify Header of storage change
-      window.dispatchEvent(new Event('storage'));
-
       setSuccess('Login successful!');
-      navigate({ to: '/' });
+      window.location.href = '/'; // Full refresh after login
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
   };
 
@@ -88,7 +78,10 @@ const Login = () => {
             value={formData.password}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
-          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          >
             Login
           </button>
         </form>

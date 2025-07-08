@@ -40,19 +40,20 @@ const Header = () => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await fetch('https://navcart.onrender.com/api/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-      localStorage.removeItem('user');
-      setUser(null);
-      navigate({ to: '/login' });
-    } catch (err) {
-      console.error('Logout failed:', err);
-    }
-  };
+const handleLogout = async () => {
+  try {
+    await fetch('https://navcart.onrender.com/api/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+    localStorage.removeItem('user');
+    setUser(null);
+    window.location.href = '/login';
+  } catch (err) {
+    console.error('Logout failed:', err);
+  }
+};
+
 
   return (
     <header className="flex justify-between items-center p-4 bg-white shadow-md">
