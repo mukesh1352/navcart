@@ -33,8 +33,8 @@ const MultiItemFinder = () => {
       setLoading(true);
       try {
         const [itemsRes, groupedRes] = await Promise.all([
-          fetch(`http://localhost:8080/items?floor=${floor}`),
-          fetch(`http://localhost:8080/grouped-items?floor=${floor}`)
+          fetch(`https://navcart-go.onrender.com/items?floor=${floor}`),
+          fetch(`https://navcart-go.onrender.com/grouped-items?floor=${floor}`)
         ]);
 
         if (!itemsRes.ok || !groupedRes.ok) throw new Error("Failed to fetch data");
@@ -150,7 +150,7 @@ const MultiItemFinder = () => {
 
         {notFound.length > 0 && (
           <div className="text-red-600 mt-4">
-            ❌ Not Found: {notFound.map((word, i) => (
+             Not Found: {notFound.map((word, i) => (
               <span key={i} className="inline-block bg-red-100 text-red-800 px-2 py-1 rounded mr-2">
                 {word}
               </span>
