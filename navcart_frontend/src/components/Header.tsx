@@ -1,4 +1,3 @@
-// src/components/Header.tsx
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
@@ -6,16 +5,22 @@ const Header = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<{ username: string } | null>(null);
 
+  // Load user from localStorage on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    // Optional: Listen to changes across tabs
-    const handleStorageChange = () => {
-      const updatedUser = localStorage.getItem('user');
-      setUser(updatedUser ? JSON.parse(updatedUser) : null);
+    const loadUser = () => {
+      const storedUser = localStorage.getItem('user');
+      setUser(storedUser ? JSON.parse(storedUser) : null);
     };
+
+    loadUser();
+
+    // Listen for login/logout from other tabs/windows
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'user') {
+        loadUser();
+      }
+    };
+
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
@@ -27,7 +32,7 @@ const Header = () => {
         credentials: 'include',
       });
       localStorage.removeItem('user');
-      setUser(null);
+      setUser(null); // Also update local state
       navigate({ to: '/login' });
     } catch (err) {
       console.error('Logout failed:', err);
