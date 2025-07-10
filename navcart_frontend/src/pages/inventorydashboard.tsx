@@ -293,7 +293,7 @@ const StoreCard: React.FC<{ store: Store; onSelect: (storeId: string) => void; i
     prediction: RestockPrediction | null;
   } | null>(null);
 
-  const { apiCall, loading } = useApi('http://localhost:3001');
+  const { apiCall, loading } = useApi('https://navcart-dashboard.onrender.com/');
 
   useEffect(() => {
     const loadStoreData = async () => {
