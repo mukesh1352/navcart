@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/inventory_db';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://mukesh:12345@cluster0.cfejaad.mongodb.net/';
 let db;
 
 // Connect to MongoDB
