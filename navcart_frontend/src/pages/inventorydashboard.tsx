@@ -387,7 +387,7 @@ const InventoryDashboard: React.FC = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [alerts, setAlerts] = useState<ApiError[]>([]);
 
-  const { apiCall, loading, error, setError } = useApi('http://localhost:3001');
+  const { apiCall, loading, error, setError } = useApi('https://navcart-dashboard.onrender.com');
 
   const addAlert = useCallback((message: string, type: ApiError['type'] = 'info') => {
     const newAlert = { message, type };
