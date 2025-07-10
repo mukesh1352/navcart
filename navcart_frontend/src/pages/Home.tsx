@@ -143,7 +143,7 @@ const Index = () => {
         Store Locator
       </Link>
       <Link
-        to="/storelocator"
+        to="/map"
         className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white text-white hover:bg-white hover:text-black transition"
       >
         <Calendar className="w-5 h-5" />
