@@ -4,7 +4,7 @@ import { MongoClient } from "mongodb";
 import { cors } from "hono/cors";
 const app = new Hono();
 app.use("*", cors({
-    origin: "*", // Allow all origins (for development)
+    origin: "*",
 }));
 // MongoDB setup
 const client = new MongoClient("mongodb+srv://mukesh:12345@cluster0.cfejaad.mongodb.net/");
@@ -72,17 +72,23 @@ app.post("/", async (c) => {
         // Step 1: Find matching departments
         const departmentsData = await inventoryDB
             .collection("items")
-            .find({
-            items: { $in: items },
-        })
-            .project({ _id: 0, department: 1 })
+            .find({ items: { $in: items } })
+            .project({ _id: 0, department: 1, items: 1 })
             .toArray();
-        let deptList = departmentsData
-            .map((d) => d.department)
-            .filter((d) => d !== "Checkouts");
-        deptList = [...new Set(deptList)]; // remove duplicates
-        deptList.push("Checkouts"); // always end at Checkouts
-        console.log("Matched departments:", deptList);
+        // ⬇️ Map item to department
+        const itemDepartments = [];
+        const foundDepts = new Set();
+        for (const item of items) {
+            for (const entry of departmentsData) {
+                if (entry.items.includes(item)) {
+                    itemDepartments.push({ item, department: entry.department });
+                    foundDepts.add(entry.department);
+                    break;
+                }
+            }
+        }
+        const deptList = Array.from(foundDepts).filter((d) => d !== "Checkouts");
+        deptList.push("Checkouts");
         // Step 2: Build graph
         const graph = await buildGraph();
         const start = "Entrance";
@@ -127,9 +133,18 @@ app.post("/", async (c) => {
         if (!bestPath) {
             return c.json({ error: "No valid path found through all departments." }, 404);
         }
+        // Step 4: All departments for layout map
+        const allDeptDocs = await graphDB
+            .collection("nodes")
+            .find({})
+            .project({ _id: 0, name: 1 })
+            .toArray();
+        const allDepartments = allDeptDocs.map((d) => d.name);
         return c.json({
             departments: deptList,
             path: bestPath,
+            allDepartments,
+            itemDepartments, // ✅ Added for frontend display
         });
     }
     catch (err) {

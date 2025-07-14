@@ -1,18 +1,25 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
+interface ItemDepartment {
+	item: string;
+	department: string;
+}
+
 export default function Search() {
 	const [itemsInput, setItemsInput] = useState("");
-	const [departments, setDepartments] = useState<string[]>([]);
-	const [path, setPath] = useState<{ id: string; name: string }[]>([]);
+	const [allDepartments, setAllDepartments] = useState<string[]>([]);
+	const [path, setPath] = useState<string[]>([]);
+	const [itemDepartments, setItemDepartments] = useState<ItemDepartment[]>([]);
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError("");
-		setDepartments([]);
+		setAllDepartments([]);
 		setPath([]);
+		setItemDepartments([]);
 		setLoading(true);
 
 		const items = itemsInput
@@ -34,22 +41,27 @@ export default function Search() {
 			});
 
 			const data = await res.json();
+			console.log("Response data from backend:", data);
 
 			if (!res.ok) {
 				setError(data.error || "Unexpected error occurred.");
 			} else {
-				setDepartments(data.departments || []);
-				const pathData = (data.path || []).map((node: string) => ({
-					id: crypto.randomUUID(),
-					name: node,
-				}));
-				setPath(pathData);
+				setAllDepartments(data.allDepartments || data.departments || []);
+				setPath(data.path || []);
+				setItemDepartments(data.itemDepartments || []);
 			}
 		} catch (_err) {
 			setError("Failed to connect to backend.");
 		}
 
 		setLoading(false);
+	};
+
+	const getColorClass = (dept: string) => {
+		if (dept === path[0]) return "bg-yellow-200 border-yellow-500";
+		if (dept === path[path.length - 1]) return "bg-red-200 border-red-500";
+		if (path.includes(dept)) return "bg-green-200 border-green-500";
+		return "bg-gray-200 border-gray-400 text-gray-600";
 	};
 
 	return (
@@ -77,39 +89,62 @@ export default function Search() {
 
 			{error && <div className="text-red-600 text-center mt-4">{error}</div>}
 
-			{departments.length > 0 && (
-				<div className="mt-8 max-w-2xl mx-auto">
-					<h2 className="text-xl font-semibold mb-2">Matched Departments:</h2>
-					<ul className="list-disc list-inside bg-white p-4 rounded shadow">
-						{departments.map((dept) => (
-							<li key={dept}>{dept}</li>
+			{itemDepartments.length > 0 && (
+				<div className="max-w-xl mx-auto mt-10">
+					<h2 className="text-lg font-semibold mb-3 text-center">
+						🧾 Item-to-Department Mapping
+					</h2>
+					<ul className="bg-white p-4 rounded shadow divide-y divide-gray-200">
+						{itemDepartments.map(({ item, department }) => (
+							<li
+								key={`${item}-${department}`}
+								className="py-2 flex justify-between"
+							>
+								<span className="font-medium text-gray-700">{item}</span>
+								<span className="text-blue-600">{department}</span>
+							</li>
 						))}
 					</ul>
 				</div>
 			)}
 
-			{path.length > 0 && (
-				<div className="mt-12 max-w-4xl mx-auto">
-					<h2 className="text-xl font-semibold mb-4 text-center">🗺️ Optimal Path Map</h2>
-					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-white p-6 rounded shadow">
-						{path.map((node, i) => (
+			{allDepartments.length > 0 && (
+				<div className="mt-12 max-w-6xl mx-auto">
+					<h2 className="text-xl font-semibold mb-4 text-center">
+						🗺️ Full Store Map (Optimal Path Highlighted)
+					</h2>
+
+					{/* 🧭 Legend */}
+					<div className="flex justify-center flex-wrap gap-4 mb-6 text-sm font-medium">
+						<div className="flex items-center gap-2">
+							<div className="w-4 h-4 bg-yellow-200 border border-yellow-500 rounded" />
+							<span>Start</span>
+						</div>
+						<div className="flex items-center gap-2">
+							<div className="w-4 h-4 bg-green-200 border border-green-500 rounded" />
+							<span>In Path</span>
+						</div>
+						<div className="flex items-center gap-2">
+							<div className="w-4 h-4 bg-red-200 border border-red-500 rounded" />
+							<span>End</span>
+						</div>
+						<div className="flex items-center gap-2">
+							<div className="w-4 h-4 bg-gray-200 border border-gray-400 rounded" />
+							<span>Not in Path</span>
+						</div>
+					</div>
+
+					{/* 🧱 Store Layout Grid */}
+					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 bg-white p-6 rounded shadow">
+						{allDepartments.map((dept) => (
 							<motion.div
-								key={node.id}
-								initial={{ opacity: 0, scale: 0.8 }}
+								key={dept}
+								initial={{ opacity: 0, scale: 0.9 }}
 								animate={{ opacity: 1, scale: 1 }}
-								transition={{ delay: i * 0.1 }}
-								className={`text-center p-4 rounded-xl border-2 ${
-									i === 0
-										? "bg-yellow-200 border-yellow-400"
-										: i === path.length - 1
-										? "bg-red-200 border-red-400"
-										: "bg-green-200 border-green-400"
-								} shadow-md`}
+								transition={{ duration: 0.3 }}
+								className={`text-center p-4 rounded-xl border-2 shadow-sm font-medium ${getColorClass(dept)}`}
 							>
-								<div className="text-xl font-bold">
-									{i === 0 ? "🏁" : i === path.length - 1 ? "🏁" : "➡️"}
-								</div>
-								<div className="text-lg font-medium mt-1">{node.name}</div>
+								{dept}
 							</motion.div>
 						))}
 					</div>

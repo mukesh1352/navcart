@@ -8,7 +8,7 @@ const app = new Hono();
 app.use(
 	"*",
 	cors({
-		origin: "*", // Allow all origins (for development)
+		origin: "*",
 	}),
 );
 
@@ -80,7 +80,7 @@ function* permutation<T>(arr: T[]): Generator<T[]> {
 app.post("/", async (c) => {
 	try {
 		const body = await c.req.json();
-		const items = body.items;
+		const items: string[] = body.items;
 
 		if (!Array.isArray(items) || items.length === 0) {
 			return c.json(
@@ -94,19 +94,26 @@ app.post("/", async (c) => {
 		// Step 1: Find matching departments
 		const departmentsData = await inventoryDB
 			.collection("items")
-			.find({
-				items: { $in: items },
-			})
-			.project({ _id: 0, department: 1 })
+			.find({ items: { $in: items } })
+			.project({ _id: 0, department: 1, items: 1 })
 			.toArray();
 
-		let deptList = departmentsData
-			.map((d) => d.department)
-			.filter((d) => d !== "Checkouts");
-		deptList = [...new Set(deptList)]; // remove duplicates
-		deptList.push("Checkouts"); // always end at Checkouts
+		// ⬇️ Map item to department
+		const itemDepartments: { item: string; department: string }[] = [];
+		const foundDepts = new Set<string>();
 
-		console.log("Matched departments:", deptList);
+		for (const item of items) {
+			for (const entry of departmentsData) {
+				if (entry.items.includes(item)) {
+					itemDepartments.push({ item, department: entry.department });
+					foundDepts.add(entry.department);
+					break;
+				}
+			}
+		}
+
+		const deptList = Array.from(foundDepts).filter((d) => d !== "Checkouts");
+		deptList.push("Checkouts");
 
 		// Step 2: Build graph
 		const graph = await buildGraph();
@@ -165,9 +172,19 @@ app.post("/", async (c) => {
 			);
 		}
 
+		// Step 4: All departments for layout map
+		const allDeptDocs = await graphDB
+			.collection("nodes")
+			.find({})
+			.project({ _id: 0, name: 1 })
+			.toArray();
+		const allDepartments = allDeptDocs.map((d) => d.name);
+
 		return c.json({
 			departments: deptList,
 			path: bestPath,
+			allDepartments,
+			itemDepartments, // ✅ Added for frontend display
 		});
 	} catch (err: unknown) {
 		if (err instanceof Error) {
