@@ -7,20 +7,26 @@ import {
 import { Outlet } from "@tanstack/react-router";
 import Home from "../pages/Home";
 import StoreLocator from "../pages/storelocator";
+import Header from "../components/Header";
 
-// Root Route with layout using <Outlet />
+// Root layout with Header + Outlet
 const rootRoute = createRootRoute({
-	component: () => <Outlet />,
+	component: () => (
+		<>
+			<Header />
+			<Outlet />
+		</>
+	),
 });
 
-// Define Home route
+// Home route
 const homeRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/",
 	component: Home,
 });
 
-// Define StoreLocator route
+// Store Locator route
 const storeLocatorRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/storelocator",
@@ -33,5 +39,5 @@ const routeTree = rootRoute.addChildren([homeRoute, storeLocatorRoute]);
 // Create the router
 export const router = createRouter({ routeTree });
 
-// Optionally, export RouterProvider to be used in main App
+// Provide the router
 export const Router = () => <RouterProvider router={router} />;
