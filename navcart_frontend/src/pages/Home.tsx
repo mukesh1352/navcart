@@ -10,6 +10,7 @@ import {
 	ArrowRight,
 	Sparkles
 } from "lucide-react";
+import {Link} from  '@tanstack/react-router'
 
 const Index = () => {
 	useEffect(() => {
@@ -154,11 +155,11 @@ const Index = () => {
 	];
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 text-gray-900 font-sans">
+	<div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 text-gray-900 font-sans">
 			{/* Hero Section */}
 			<section className="relative h-screen bg-[url('/image3.png')] bg-cover bg-center flex items-center justify-center text-white overflow-hidden">
 				<div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60" />
-				
+
 				{/* Animated background elements */}
 				<div className="absolute inset-0 overflow-hidden">
 					<div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
@@ -180,27 +181,24 @@ const Index = () => {
 					</p>
 
 					<div className="flex flex-wrap justify-center gap-4 pt-8">
-  <button
-    type="button"
-    className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 text-white font-semibold shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
-  >
-    <MapPin className="w-5 h-5 group-hover:scale-110 transition-transform" />
-    <span>Store Locator</span>
-    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-  </button>
+						<Link
+							to="/storelocator"
+							className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 text-white font-semibold shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+						>
+							<MapPin className="w-5 h-5 group-hover:scale-110 transition-transform" />
+							<span>Store Locator</span>
+							<ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+						</Link>
 
-  <button
-    type="button"
-    className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 text-white hover:bg-white/20 transition-all duration-300 font-semibold shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
-  >
-    <Calendar className="w-5 h-5 group-hover:scale-110 transition-transform" />
-    <span>Store Map</span>
-    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-  </button>
-</div>
-
-
-
+						<Link
+							to="/store-map"
+							className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 text-white hover:bg-white/20 transition-all duration-300 font-semibold shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+						>
+							<Calendar className="w-5 h-5 group-hover:scale-110 transition-transform" />
+							<span>Store Map</span>
+							<ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+						</Link>
+					</div>
 				</div>
 			</section>
 
