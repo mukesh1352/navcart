@@ -193,11 +193,11 @@ const Index = () => {
 						</Link>
 
 						<Link
-							to="/store-map"
+							to="/search"
 							className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 text-white hover:bg-white/20 transition-all duration-300 font-semibold shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
 						>
 							<Calendar className="w-5 h-5 group-hover:scale-110 transition-transform" />
-							<span>Store Map</span>
+							<span>Department-Navigator</span>
 							<ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
 						</Link>
 					</div>

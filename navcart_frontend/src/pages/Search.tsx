@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function Search() {
 	const [itemsInput, setItemsInput] = useState("");
@@ -53,7 +54,7 @@ export default function Search() {
 
 	return (
 		<div className="min-h-screen bg-gray-100 p-8">
-			<h1 className="text-3xl font-bold mb-6 text-center">
+			<h1 className="text-3xl font-bold mb-6 text-center text-blue-800">
 				🛒 NavCart Path Finder
 			</h1>
 
@@ -63,7 +64,7 @@ export default function Search() {
 					value={itemsInput}
 					onChange={(e) => setItemsInput(e.target.value)}
 					placeholder="Enter items (comma separated)"
-					className="w-full p-3 border rounded mb-4"
+					className="w-full p-3 border rounded mb-4 shadow-sm"
 				/>
 				<button
 					type="submit"
@@ -88,18 +89,28 @@ export default function Search() {
 			)}
 
 			{path.length > 0 && (
-				<div className="mt-8 max-w-2xl mx-auto">
-					<h2 className="text-xl font-semibold mb-2">Optimal Path:</h2>
-					<div className="bg-white p-4 rounded shadow flex flex-wrap gap-2">
+				<div className="mt-12 max-w-4xl mx-auto">
+					<h2 className="text-xl font-semibold mb-4 text-center">🗺️ Optimal Path Map</h2>
+					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-white p-6 rounded shadow">
 						{path.map((node, i) => (
-							<div
+							<motion.div
 								key={node.id}
-								className="px-3 py-1 rounded-full bg-green-200 text-green-900 text-sm font-medium"
+								initial={{ opacity: 0, scale: 0.8 }}
+								animate={{ opacity: 1, scale: 1 }}
+								transition={{ delay: i * 0.1 }}
+								className={`text-center p-4 rounded-xl border-2 ${
+									i === 0
+										? "bg-yellow-200 border-yellow-400"
+										: i === path.length - 1
+										? "bg-red-200 border-red-400"
+										: "bg-green-200 border-green-400"
+								} shadow-md`}
 							>
-								{i === 0 ? "🏁 " : ""}
-								{node.name}
-								{i === path.length - 1 ? " 🏁" : ""}
-							</div>
+								<div className="text-xl font-bold">
+									{i === 0 ? "🏁" : i === path.length - 1 ? "🏁" : "➡️"}
+								</div>
+								<div className="text-lg font-medium mt-1">{node.name}</div>
+							</motion.div>
 						))}
 					</div>
 				</div>
