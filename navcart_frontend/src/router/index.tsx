@@ -1,30 +1,30 @@
 import {
-  createRootRoute,
-  createRoute,
-  createRouter,
-  RouterProvider,
+	createRootRoute,
+	createRoute,
+	createRouter,
+	RouterProvider,
 } from "@tanstack/react-router";
 import { Outlet } from "@tanstack/react-router";
 import Home from "../pages/Home";
-import StoreLocator from "../pages/storelocator"
+import StoreLocator from "../pages/storelocator";
 
 // Root Route with layout using <Outlet />
 const rootRoute = createRootRoute({
-  component: () => <Outlet />,
+	component: () => <Outlet />,
 });
 
 // Define Home route
 const homeRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/",
-  component: Home,
+	getParentRoute: () => rootRoute,
+	path: "/",
+	component: Home,
 });
 
 // Define StoreLocator route
 const storeLocatorRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/storelocator",
-  component: StoreLocator,
+	getParentRoute: () => rootRoute,
+	path: "/storelocator",
+	component: StoreLocator,
 });
 
 // Add children to root route
