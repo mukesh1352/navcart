@@ -8,9 +8,9 @@ import {
 	Utensils,
 	Car,
 	ArrowRight,
-	Sparkles
+	Sparkles,
 } from "lucide-react";
-import {Link} from  '@tanstack/react-router'
+import { Link } from "@tanstack/react-router";
 
 const Index = () => {
 	useEffect(() => {
@@ -155,7 +155,7 @@ const Index = () => {
 	];
 
 	return (
-	<div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 text-gray-900 font-sans">
+		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 text-gray-900 font-sans">
 			{/* Hero Section */}
 			<section className="relative h-screen bg-[url('/image3.png')] bg-cover bg-center flex items-center justify-center text-white overflow-hidden">
 				<div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60" />
@@ -170,7 +170,9 @@ const Index = () => {
 				<div className="relative z-10 text-center space-y-8 px-4 max-w-4xl">
 					<div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-lg rounded-full border border-white/20 mb-4">
 						<Sparkles className="w-4 h-4 text-yellow-400" />
-						<span className="text-sm font-medium">Smart Shopping Revolution</span>
+						<span className="text-sm font-medium">
+							Smart Shopping Revolution
+						</span>
 					</div>
 
 					<h1 className="text-6xl md:text-8xl font-black drop-shadow-2xl bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent leading-tight">
@@ -212,8 +214,13 @@ const Index = () => {
 							["25K+", "Daily Customers", "from-green-500 to-emerald-500"],
 							["24/7", "Open Locations", "from-orange-500 to-red-500"],
 						].map(([value, label, gradient]) => (
-							<div key={label} className="group hover:scale-105 transition-transform duration-300">
-								<div className={`text-5xl font-black bg-gradient-to-r ${gradient} bg-clip-text text-transparent mb-2`}>
+							<div
+								key={label}
+								className="group hover:scale-105 transition-transform duration-300"
+							>
+								<div
+									className={`text-5xl font-black bg-gradient-to-r ${gradient} bg-clip-text text-transparent mb-2`}
+								>
 									{value}
 								</div>
 								<p className="text-gray-600 font-medium">{label}</p>
@@ -245,7 +252,9 @@ const Index = () => {
 										className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
 										style={{ backgroundImage: `url(${dept.image})` }}
 									/>
-									<div className={`absolute inset-0 bg-gradient-to-t ${dept.gradient} opacity-40 group-hover:opacity-60 transition-opacity duration-300`} />
+									<div
+										className={`absolute inset-0 bg-gradient-to-t ${dept.gradient} opacity-40 group-hover:opacity-60 transition-opacity duration-300`}
+									/>
 									<div className="absolute inset-0 flex items-center justify-center">
 										<span className="text-6xl backdrop-blur-sm bg-white/20 p-4 rounded-2xl transform group-hover:scale-110 transition-transform duration-300">
 											{dept.icon}
@@ -259,13 +268,19 @@ const Index = () => {
 										</h3>
 										<div className="flex items-center gap-1 text-yellow-500">
 											<Star className="w-4 h-4 fill-current" />
-											<span className="text-sm font-semibold">{dept.rating}</span>
+											<span className="text-sm font-semibold">
+												{dept.rating}
+											</span>
 										</div>
 									</div>
-									<div className={`inline-block px-3 py-1 bg-gradient-to-r ${dept.gradient} text-white text-xs font-semibold rounded-full`}>
+									<div
+										className={`inline-block px-3 py-1 bg-gradient-to-r ${dept.gradient} text-white text-xs font-semibold rounded-full`}
+									>
 										{dept.category}
 									</div>
-									<p className="text-gray-600 text-sm leading-relaxed">{dept.description}</p>
+									<p className="text-gray-600 text-sm leading-relaxed">
+										{dept.description}
+									</p>
 								</div>
 							</div>
 						))}
@@ -290,11 +305,17 @@ const Index = () => {
 								key={service.id}
 								className={`group ${service.color} backdrop-blur-lg rounded-3xl shadow-lg p-8 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-white/50`}
 							>
-								<div className={`w-16 h-16 mx-auto mb-6 ${service.iconColor} bg-white/50 backdrop-blur-lg flex items-center justify-center rounded-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg`}>
+								<div
+									className={`w-16 h-16 mx-auto mb-6 ${service.iconColor} bg-white/50 backdrop-blur-lg flex items-center justify-center rounded-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg`}
+								>
 									{service.icon}
 								</div>
-								<h3 className="text-xl font-bold mb-3 text-gray-800">{service.title}</h3>
-								<p className="text-gray-600 leading-relaxed">{service.description}</p>
+								<h3 className="text-xl font-bold mb-3 text-gray-800">
+									{service.title}
+								</h3>
+								<p className="text-gray-600 leading-relaxed">
+									{service.description}
+								</p>
 							</div>
 						))}
 					</div>
@@ -319,23 +340,34 @@ const Index = () => {
 								className="group relative bg-white/80 backdrop-blur-lg border border-gray-200/50 rounded-3xl p-8 text-center shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 overflow-hidden"
 							>
 								<div className="absolute top-4 right-4">
-									<span className={`inline-block px-3 py-1 text-xs font-bold text-white bg-gradient-to-r ${deal.gradient} rounded-full`}>
+									<span
+										className={`inline-block px-3 py-1 text-xs font-bold text-white bg-gradient-to-r ${deal.gradient} rounded-full`}
+									>
 										{deal.badge}
 									</span>
 								</div>
-								
-								<div className={`w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br ${deal.gradient} text-white flex items-center justify-center text-3xl font-black shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-300`}>
+
+								<div
+									className={`w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br ${deal.gradient} text-white flex items-center justify-center text-3xl font-black shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-300`}
+								>
 									%
 								</div>
-								
-								<h3 className="text-2xl font-bold text-gray-800 mb-2">{deal.title}</h3>
+
+								<h3 className="text-2xl font-bold text-gray-800 mb-2">
+									{deal.title}
+								</h3>
 								<p className="text-gray-500 mb-4">{deal.date}</p>
-								<div className={`text-2xl font-black bg-gradient-to-r ${deal.gradient} bg-clip-text text-transparent`}>
+								<div
+									className={`text-2xl font-black bg-gradient-to-r ${deal.gradient} bg-clip-text text-transparent`}
+								>
 									{deal.discount}
 								</div>
-								
+
 								<div className="mt-6">
-									<button type = "button" className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r ${deal.gradient} text-white font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300`}>
+									<button
+										type="button"
+										className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r ${deal.gradient} text-white font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300`}
+									>
 										Claim Deal
 										<ArrowRight className="w-4 h-4" />
 									</button>
