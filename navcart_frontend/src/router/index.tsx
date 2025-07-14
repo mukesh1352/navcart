@@ -8,7 +8,7 @@ import { Outlet } from "@tanstack/react-router";
 import Home from "../pages/Home";
 import StoreLocator from "../pages/storelocator";
 import Header from "../components/Header";
-
+import Search from "../pages/Search";
 // Root layout with Header + Outlet
 const rootRoute = createRootRoute({
 	component: () => (
@@ -25,7 +25,11 @@ const homeRoute = createRoute({
 	path: "/",
 	component: Home,
 });
-
+const searchroute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/search",
+	component: Search,
+});
 // Store Locator route
 const storeLocatorRoute = createRoute({
 	getParentRoute: () => rootRoute,
@@ -34,7 +38,11 @@ const storeLocatorRoute = createRoute({
 });
 
 // Add children to root route
-const routeTree = rootRoute.addChildren([homeRoute, storeLocatorRoute]);
+const routeTree = rootRoute.addChildren([
+	homeRoute,
+	storeLocatorRoute,
+	searchroute,
+]);
 
 // Create the router
 export const router = createRouter({ routeTree });
